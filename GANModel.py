@@ -24,7 +24,7 @@ class GANModel():
 
         # self.discriminator.trainable = False
 
-        validity = self.discriminator(img)
+        validity = self.discriminator(img) #Validate images as real/ fake
 
         self.combined = Model(z, validity)
         self.combined.compile(loss='sparse_categorical_crossentropy', optimizer=optimizer)
