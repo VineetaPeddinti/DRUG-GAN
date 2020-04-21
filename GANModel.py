@@ -30,7 +30,7 @@ class GANModel():
 
         
 
-        validity = self.discriminator(img)
+        validity = self.discriminator(img) #Validate images as real/ fake
 
         self.combined = Model(z, validity)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
