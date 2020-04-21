@@ -67,9 +67,14 @@ class Preprocessor():
             for smi in out_smiles:
                 f.write(smi + '\n')
         train_data = np.asarray(one_hot_tokens, dtype=np.float32)
+        print(train_data.shape)
+        # print(pp.max_len)
+        # print(pp.table_len)
+        # print(train_data[0])
         g =  GANModel(pp.max_len,pp.table_len)
         g.train(100,64,50,train_data)
         imagesss = g.sample_images()
-        print(imagesss[0][0][0])
+        print(imagesss[0].shape)
+        print(imagesss[0].reshape(1, 134,50)[0][0:20])
 if __name__ == "__main__":
     Preprocessor().main()

@@ -11,5 +11,5 @@ class Encoder(object):
             # [self.one_hot_dict[symbol] for symbol in tqdm(smile)],
             [self.one_hot_dict[symbol] for symbol in smile],
             dtype=np.float32)
-        result = result.reshape(1, result.shape[0], result.shape[1])
+        result = result.reshape(result.shape[0], result.shape[1],1)
         return result
