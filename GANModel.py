@@ -1,4 +1,4 @@
-from keras.layers import Input, Dense, Reshape, Flatten, Dropout
+from keras.layers import Input, Dense,LSTM, Reshape, Flatten, Dropout
 from keras.layers import BatchNormalization, Activation
 from keras.layers.advanced_activations import LeakyReLU
 from keras.models import Sequential, Model
@@ -12,7 +12,7 @@ class GANModel():
         self.channels = 1
         self.img_shape = (self.img_rows, self.img_cols, self.channels)
         self.latent_dim = 100
-        optimizer = Adam(0.9, 0.999)
+        optimizer = Adam(learning_rate=0.001, beta_1=0.9, beta_2=0.999)
 
         self.discriminator = self.discriminator()
         self.discriminator.compile(loss='binary_crossentropy',
@@ -20,7 +20,7 @@ class GANModel():
             metrics=['accuracy'])
 
         self.generator = self.generator()
-        self.generator.compile(loss='binary_crossentropy',
+        self.generator.compile(loss='categorical_crossentropy',
             optimizer=optimizer,
             metrics=['accuracy'])
         self.discriminator.trainable = False
@@ -31,7 +31,7 @@ class GANModel():
         
 
         validity = self.discriminator(img) #Validate images as real/ fake
-
+        print("validity")
         self.combined = Model(z, validity)
         self.combined.compile(loss='binary_crossentropy', optimizer=optimizer)
 
@@ -48,14 +48,16 @@ class GANModel():
         model.add(BatchNormalization(momentum=0.8))
         model.add(Dense(np.prod(self.img_shape), activation='softmax'))
         model.add(Reshape(self.img_shape))
-        model.summary()
-        noise = Input(shape=(self.latent_dim,))
-        img = model(noise)
-        return Model(noise, img)
-        # return model
+        print(model.summary())
+        # noise = Input(shape=(self.latent_dim,))
+        # img = model(noise)
+        # return Model(noise, img)
+        return model
     def discriminator(self):
         model = Sequential()
-        model.add(Flatten(input_shape=self.img_shape))
+        # model.add(Flatten(input_shape=self.img_shape))
+        model.add(LSTM(512,input_dim=self.img_shape, return_sequences=True))
+        model.add(LeakyReLU(alpha=0.2))
         model.add(Dense(512))
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dense(256))
@@ -64,10 +66,10 @@ class GANModel():
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dense(1, activation='sigmoid'))
         model.summary()
-        img = Input(shape=self.img_shape)
-        validity = model(img)
-        return Model(img, validity)
-        # return model
+        # img = Input(shape=self.img_shape)
+        # validity = model(img)
+        # return Model(img, validity)
+        return model
     def train(self,epochs, batch_size, sample_interval, X_train):
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))
@@ -78,6 +80,7 @@ class GANModel():
             real_data = X_train[idx]
             d_loss_real = self.discriminator.train_on_batch(real_data, valid)
             d_loss_fake = self.discriminator.train_on_batch(gen_data, fake)
+            
             g_loss = self.combined.train_on_batch(noise, valid)
             d_loss = 0.5 * np.add(d_loss_real, d_loss_fake)
         print ("%d [D loss: %f, acc.: %.2f%%] [G loss: %f]" % (epoch, d_loss[0], 100*d_loss[1], g_loss))
