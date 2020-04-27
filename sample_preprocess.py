@@ -1,8 +1,8 @@
 import argparse
 import os
 from tqdm import tqdm
-from rdkit import Chem, RDLogger
-from rdkit.Chem import MolStandardize
+# from rdkit import Chem, RDLogger
+# from rdkit.Chem import MolStandardize
 from Tokenizer import *
 from Encoder import *
 from GANModel import *
