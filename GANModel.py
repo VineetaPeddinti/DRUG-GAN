@@ -53,11 +53,7 @@ class GANModel():
         model.add(Dense(np.prod(self.smile_shape), activation='tanh'))
         model.add(Reshape(self.smile_shape))
         model.summary()
-        
-        noise = Input(shape=(self.latent_dim,))
-        seq = model(noise)
-
-        return Model(noise, seq)
+        return model
     def discriminator(self):
         model = Sequential()
         model.add(LSTM(512, input_shape=self.smile_shape, return_sequences=True))
@@ -68,11 +64,7 @@ class GANModel():
         model.add(LeakyReLU(alpha=0.2))
         model.add(Dense(1, activation='sigmoid'))
         model.summary()
-
-        seq = Input(shape=self.smile_shape)
-        validity = model(seq)
-
-        return Model(seq, validity)
+        return model
     def train(self,epochs, batch_size, sample_interval, X_train):
         valid = np.ones((batch_size, 1))
         fake = np.zeros((batch_size, 1))

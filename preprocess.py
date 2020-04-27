@@ -17,7 +17,7 @@ class Preprocessor():
         self.uc = MolStandardize.charge.Uncharger()
         self.max_len = 0
         self.one_hot_dict = {}
-        self.data_length = 10000
+        self.data_length = 1000
 
     def process(self, smi):
         mol = Chem.MolFromSmiles(smi)
@@ -77,7 +77,7 @@ class Preprocessor():
         # print(pp.table_len)
         # print(train_data[0])
         g =  GANModel(pp.max_len,pp.table_len,int_to_smi)
-        g.train(100,64,50,sp.network_input)
+        g.train(100,128,50,sp.network_input)
         g.sample_images()
         # print(imagesss[0].reshape(1, pp.table_len,pp.max_len)[0][0:50][562])
 if __name__ == "__main__":
